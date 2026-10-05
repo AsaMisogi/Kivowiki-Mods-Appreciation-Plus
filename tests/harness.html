@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Appreciation Plus 本地验证</title>
+  <style>
+    body {
+      font: 15px/1.6 system-ui;
+      margin: 30px;
+      background: #eaf0f5;
+      color: #203847;
+    }
+    main {
+      max-width: 1050px;
+      margin: auto;
+    }
+    button,
+    a {
+      margin: 5px;
+      padding: 8px;
+    }
+    h2 {
+      margin-top: 25px;
+    }
+    pre {
+      white-space: pre-wrap;
+    }
+    .native {
+      background: #cedce5;
+      padding: 15px;
+      border-radius: 12px;
+    }
+    #render-tests canvas {
+      max-width: 300px;
+    }
+    #tests {
+      color: #164769;
+    }
+  </style>
+  <main>
+    <h1>Appreciation Plus 本地验证</h1>
+    <p>
+      使用公开 API 与真实角色资源。此页模拟站点已核实的鉴赏标题和 Tab 结构。
+    </p>
+    <nav>
+      <a href="/data/character/3?mode=appreciation">角色 3</a
+      ><a href="/data/character/365?mode=appreciation">角色 365</a
+      ><button id="disable">停用模块</button
+      ><button id="suite">运行真实资源与导出验证</button>
+      <button id="playback-suite">验证播放界面</button>
+      <button id="config-test">打开配置沙箱</button
+      ><button id="config-reopen">重新载入配置</button>
+    </nav>
+    <p id="saved-settings"></p>
+    <iframe
+      id="config-frame"
+      title="模块配置沙箱"
+      sandbox="allow-scripts"
+      hidden
+      style="width: 100%; height: 650px"
+    ></iframe>
+    <pre id="tests"></pre>
+    <div id="render-tests"></div>
+    <h2>立绘鉴赏</h2>
+    <div class="n-tabs native">
+      <div class="n-tabs-tab--active" id="spr" data-name="1236">当前立绘</div>
+      <div id="pixi-spine-test">原站播放器占位（不被模块移动）</div>
+    </div>
+    <h2>回忆大厅</h2>
+    <div class="n-tabs native">
+      <div class="n-tabs-tab--active" id="home" data-name="370">
+        当前回忆大厅
+      </div>
+    </div>
+    <h2>人物模型 (可以拖动哦)</h2>
+    <div class="native">原站模型占位</div>
+    <h2>光环模型 (可以拖动哦)</h2>
+    <div class="native">原站光环占位</div>
+  </main>
+  <script src="/published-entry.js"></script>
+  <script src="/test-results/browser.js"></script>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "kivowiki-mods-appreciation-plus",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "acorn": "8.15.0",
+    "esbuild": "0.25.10",
+    "prettier": "3.6.2"
+  },
+  "dependencies": {
+    "@esotericsoftware/spine-pixi-v8": "4.2.95",
+    "@ffmpeg/core": "0.12.10",
+    "fflate": "0.8.2",
+    "pixi.js": "8.13.2",
+    "three": "0.178.0"
+  }
+}

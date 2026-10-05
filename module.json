@@ -1,0 +1,78 @@
+{
+  "manifestVersion": 4,
+  "type": "module",
+  "id": "appreciation-plus",
+  "name": "Kivowiki-Mods-Appreciation-Plus",
+  "version": "1.2.0",
+  "author": "朝禊ASOGI",
+  "description": "角色 Spine 与模型沉浸鉴赏、区域裁剪、嘴型贴图预览及本地多格式视频导出。",
+  "mode": "page",
+  "entry": "dist/index.js",
+  "config": "dist/config.js",
+  "permissions": [
+    {
+      "id": "page.read",
+      "reason": "识别角色鉴赏区域与当前选中的资源。"
+    },
+    {
+      "id": "page.modify",
+      "reason": "增加鉴赏入口和独立沉浸窗口。"
+    },
+    {
+      "id": "settings",
+      "reason": "保存默认全屏、背景与导出选项。"
+    },
+    {
+      "id": "assets",
+      "reason": "读取随包提供的本地转码器与嘴型图集。"
+    },
+    {
+      "id": "network.read",
+      "reason": "通过 Core 读取公开角色数据，加载 Wiki 的骨骼、模型和贴图。"
+    }
+  ],
+  "dependencies": {
+    "core-runtime": "^1.1.0"
+  },
+  "engines": {
+    "kivowikiMods": "^1.6.1",
+    "api": "^1.1.0"
+  },
+  "claims": {
+    "globals": [],
+    "pageSelectors": [
+      ".kvap-entry",
+      ".kvap-dialog"
+    ],
+    "routes": [
+      "/data/character"
+    ]
+  },
+  "settings": {
+    "fullscreen": false,
+    "background": "#17212b",
+    "backgroundAlpha": 1,
+    "previewBackgroundOnly": true,
+    "homeMode": "fit",
+    "quality": 2,
+    "videoFormat": "mov",
+    "longEdge": 1920,
+    "fps": 30,
+    "fixBlend": true
+  },
+  "files": [
+    "module.json",
+    "dist/index.js",
+    "dist/config.js",
+    "assets/ffmpeg-worker.js",
+    "assets/encoded",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+    "licenses",
+    "docs/ENGINEERING.md",
+    "docs/screenshots"
+  ],
+  "source": {
+    "repository": "https://github.com/AsaMisogi/Kivowiki-Mods-Appreciation-Plus"
+  }
+}

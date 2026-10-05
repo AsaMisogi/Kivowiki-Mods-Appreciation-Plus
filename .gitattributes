@@ -1,0 +1,4 @@
+* text=auto eol=lf
+dist/** linguist-generated=true
+assets/encoded/** linguist-generated=true
+assets/ffmpeg-worker.js linguist-generated=true
