@@ -3,7 +3,7 @@
   "type": "module",
   "id": "appreciation-plus",
   "name": "Kivowiki-Mods-Appreciation-Plus",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "朝禊ASOGI",
   "description": "角色 Spine 与模型沉浸鉴赏、区域裁剪、嘴型贴图预览及本地多格式视频导出。",
   "mode": "page",

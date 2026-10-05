@@ -192,6 +192,21 @@ document.querySelector("#suite").onclick = async (event) => {
         }
         if (r.type === "home") {
           say(`原始内容 ${JSON.stringify(engine.contentBounds)}`);
+          // 默认填充预览和保存图像必须逐像素一致，覆盖非 16:9 窗口与 DPR。
+          engine.setHomeMode("fill");
+          const frame = engine.beginExport({ homeMode: "fill" });
+          if (frame.x !== -1500 || frame.y !== -1687.5 || frame.width !== 3000)
+            throw new Error("回忆大厅取景偏离站内骨骼原点");
+          engine.endExport();
+          engine.resize(640, 480, 2);
+          engine.seek(0.1);
+          const previewCanvas = document.createElement("canvas");
+          previewCanvas.width = 1280;
+          previewCanvas.height = 720;
+          previewCanvas
+            .getContext("2d")
+            .drawImage(engine.canvas, 0, 120, 1280, 720, 0, 0, 1280, 720);
+          const preview = pixels(previewCanvas).rgba;
           const homeExport = await exportMedia({
             renderer: engine,
             context,
@@ -221,6 +236,12 @@ document.querySelector("#suite").onclick = async (event) => {
           ctx.drawImage(bitmap, 0, 0);
           bitmap.close();
           const rgba = ctx.getImageData(0, 0, check.width, check.height).data;
+          let difference = 0;
+          for (let i = 0; i < rgba.length; i++)
+            difference += Math.abs(rgba[i] - preview[i]);
+          if (difference / rgba.length > 0.1)
+            throw new Error("回忆大厅预览与保存构图不一致");
+          say(`PASS ${id} 站内取景 / 4:3 窗口 DPR 2 与 PNG 像素一致`);
           let transparent = 0;
           for (let i = 3; i < rgba.length; i += 4)
             if (rgba[i] < 250) transparent++;

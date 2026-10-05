@@ -13,39 +13,26 @@ import {
   outputSize,
   zoomAt,
   Scope,
-  contentFrame,
+  homeFrame,
   exportSize,
 } from "../src/util.js";
 import { connectedTriangles } from "../src/mesh-parts.js";
 import { characterId, sectionKind } from "../src/site.js";
 import { videoArgs } from "../src/export.js";
 import { readBinary } from "../src/assets.js";
-import { opaqueRectangle } from "../src/content-bounds.js";
 // 独立克隆本模块时不要求固定的上层目录结构；集成测试可显式指定 Core 源码。
 const coreDirectory = process.env.KIVOWIKI_CORE_DIR
   ? resolve(process.env.KIVOWIKI_CORE_DIR)
   : fileURLToPath(new URL("../../../Kivowiki-Mods-Core/", import.meta.url));
 const coreMissing = !existsSync(resolve(coreDirectory, "module-store.js"));
-test("背景覆盖检测排除透明边与孤立特效", () => {
-  const rgba = new Uint8Array(8 * 6 * 4);
-  for (let y = 1; y < 5; y++)
-    for (let x = 2; x < 7; x++) rgba[(y * 8 + x) * 4 + 3] = 255;
-  rgba[3] = 255;
-  assert.deepEqual(opaqueRectangle(rgba, 8, 6), {
-    x: 2,
-    y: 1,
-    width: 5,
-    height: 4,
-  });
-});
 test("内容取景与窗口比例解耦，壁纸严格 16:9，原始尺寸不放大", () => {
   const bounds = { x: -800, y: -600, width: 1600, height: 1200 };
-  assert.deepEqual(contentFrame(bounds, "fit"), bounds);
-  assert.deepEqual(contentFrame(bounds, "fill"), {
-    x: -800,
-    y: -450,
-    width: 1600,
-    height: 900,
+  assert.deepEqual(homeFrame(bounds, "fit"), bounds);
+  assert.deepEqual(homeFrame(bounds, "fill"), {
+    x: -1500,
+    y: -1687.5,
+    width: 3000,
+    height: 1687.5,
   });
   assert.deepEqual(exportSize(1600, 900, 854, true, true), {
     width: 864,
@@ -61,6 +48,36 @@ test("内容取景与窗口比例解耦，壁纸严格 16:9，原始尺寸不放
     "native",
   );
   assert.equal(settingsOf({ backgroundAlpha: 0 }).backgroundAlpha, 0);
+});
+
+test("填充构图与原站骨骼定位一致，不随不对称背景偏移", () => {
+  for (const bounds of [
+    { x: -2700, y: -2100, width: 5500, height: 2400 },
+    { x: -1600, y: -1800, width: 3474, height: 2100 },
+  ]) {
+    const frame = homeFrame(bounds, "fill");
+    for (const width of [640, 1280, 1920, 3840]) {
+      const height = (width * 9) / 16;
+      const scale = width / frame.width;
+      // 用站内定位公式作为独立参照，验证实际坐标而非只检查输出宽高。
+      for (const [x, y] of [
+        [0, 0],
+        [0, -900],
+        [-700, -1200],
+        [800, -300],
+      ]) {
+        assert.ok(
+          Math.abs((x - frame.x) * scale - (width / 2 + (x * width) / 3000)) <
+            1e-9,
+        );
+        assert.ok(
+          Math.abs((y - frame.y) * scale - (height + (y * width) / 3000)) <
+            1e-9,
+        );
+      }
+    }
+    assert.deepEqual(homeFrame(bounds, "fit"), bounds);
+  }
 });
 
 test("反向拖拽、越界和高 DPI 导出裁剪都使用一致坐标", () => {

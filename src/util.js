@@ -37,18 +37,17 @@ export function settingsOf(raw = {}) {
     fixBlend: raw.fixBlend !== false,
   };
 }
-/** 填充裁剪成严格 16:9；适应使用内容原比例，均不包含预览窗口的空白。 */
-export function contentFrame(bounds, mode) {
-  const rect = { ...bounds };
-  if (mode === "fill") {
-    const width = Math.min(rect.width, (rect.height * 16) / 9);
-    const height = (width * 9) / 16;
-    rect.x += (rect.width - width) / 2;
-    rect.y += (rect.height - height) / 2;
-    rect.width = width;
-    rect.height = height;
-  }
-  return rect;
+/**
+ * 回忆大厅预览与导出共用取景，坐标采用 Pixi 的 Y 向下方向。
+ * 原站 fill 的 scale = 画布宽 / 3000，骨骼位置为 (画布宽 / 2, 画布高)。
+ * 反变换后即下列固定 16:9 矩形：骨骼原点在底部中央，而非背景附件中心。
+ * 背景可能不对称、带羽化边或画外特效，不能用 alpha 覆盖区改变作者的构图。
+ * fit 保留完整背景内容；两种模式均与窗口尺寸、DPR、导出分辨率无关。
+ */
+export function homeFrame(bounds, mode) {
+  return mode === "fill"
+    ? { x: -1500, y: -1687.5, width: 3000, height: 1687.5 }
+    : { ...bounds };
 }
 export function exportSize(
   width,

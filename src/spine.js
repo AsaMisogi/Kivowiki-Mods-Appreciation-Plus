@@ -4,8 +4,7 @@ import {
   BlendMode,
   TextureFilter,
 } from "@esotericsoftware/spine-pixi-v8";
-import { checkAbort, zoomAt, contentFrame } from "./util.js";
-import { opaqueRectangle } from "./content-bounds.js";
+import { checkAbort, zoomAt, homeFrame } from "./util.js";
 import { animationTime } from "./playback.js";
 
 // Pixi 资源缓存属于本模块自己的运行时。窗口快速关闭/重开时用引用计数和串行卸载，
@@ -189,45 +188,12 @@ export async function createSpine(host, resource, settings, scope) {
   }
   let homeMode = settings.homeMode || "fit",
     exportFrame = null;
-  let fillBounds = homeBounds;
-  if (isHome) {
-    // 主背景仍可能带透明羽化边。先在原始坐标取样，填充模式只取可靠的覆盖区。
-    const sampleScale = Math.min(
-      1,
-      1024 / Math.max(homeBounds.width, homeBounds.height),
-    );
-    const sw = Math.max(2, Math.floor(homeBounds.width * sampleScale)),
-      sh = Math.max(2, Math.floor(homeBounds.height * sampleScale));
-    app.renderer.resize(sw, sh, 1);
-    spine.scale.set(sampleScale);
-    spine.position.set(
-      -homeBounds.x * sampleScale,
-      -homeBounds.y * sampleScale,
-    );
-    app.render();
-    const gl = app.renderer.gl,
-      pixels = new Uint8Array(sw * sh * 4);
-    gl.readPixels(0, 0, sw, sh, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    const safe = opaqueRectangle(pixels, sw, sh);
-    if (safe.width * safe.height >= sw * sh * 0.5) {
-      // readPixels 原点在左下；向内缩一个采样像素，覆盖 mipmap 边缘舍入。
-      fillBounds = {
-        x: homeBounds.x + (safe.x + 1) / sampleScale,
-        y: homeBounds.y + (sh - safe.y - safe.height + 1) / sampleScale,
-        width: (safe.width - 2) / sampleScale,
-        height: (safe.height - 2) / sampleScale,
-      };
-    }
-  }
   const mask = new Graphics();
   app.stage.addChild(mask);
   spine.mask = mask;
   function render() {
     const frame =
-      exportFrame ||
-      (isHome
-        ? contentFrame(homeMode === "fill" ? fillBounds : homeBounds, homeMode)
-        : bounds);
+      exportFrame || (isHome ? homeFrame(homeBounds, homeMode) : bounds);
     scale =
       Math.min(w / frame.width, h / frame.height) *
       (isHome || exportFrame ? 1 : 0.9);
@@ -264,10 +230,7 @@ export async function createSpine(host, resource, settings, scope) {
     },
     beginExport(options) {
       exportFrame = isHome
-        ? contentFrame(
-            (options.homeMode || homeMode) === "fill" ? fillBounds : homeBounds,
-            options.homeMode || homeMode,
-          )
+        ? homeFrame(homeBounds, options.homeMode || homeMode)
         : options.longEdge === "native"
           ? nativeBounds
           : null;
